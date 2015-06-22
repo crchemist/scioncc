@@ -64,7 +64,7 @@ class EndpointUnit(object):
     def __init__(self, endpoint=None, interceptors=None):
         self._endpoint = endpoint
         self.interceptors = interceptors
-        self._unique_name = uuid.uuid4().hex    # MM: For use as send/desitination name (in part. RPC queues)
+        self._unique_name = uuid.uuid4().hex    # MM: For use as send/destination name (in part. RPC queues)
 
     @property
     def interceptors(self):
@@ -193,7 +193,6 @@ class EndpointUnit(object):
         return inv_prime
 
     def close(self):
-
         if self.channel is not None:
             ev = self.channel.close()
             if not ev.wait(timeout=3):
@@ -206,7 +205,7 @@ class EndpointUnit(object):
         Any headers passed in here are strictly for reference. Headers set in there will take
         precedence and override any headers with the same key.
         """
-        return {'ts':get_ion_ts()}
+        return {'ts': get_ion_ts()}
 
     def _build_payload(self, raw_msg, raw_headers):
         """
@@ -229,6 +228,7 @@ class EndpointUnit(object):
 
         return payload, header
 
+
 class BaseEndpoint(object):
     """
     An Endpoint is an object capable of communication with one or more other Endpoints.
@@ -243,21 +243,11 @@ class BaseEndpoint(object):
     channel_type = BidirClientChannel
     node = None     # connection to the broker, basically
 
-    # Endpoints
-    # TODO: Make weakref or replace entirely
-    endpoint_by_name = {}
     _interceptors = None
 
     def __init__(self, node=None, transport=None):
-
         self.node = node
         self._transport = transport
-
-#        # @TODO: MOVE THIS
-#        if name in self.endpoint_by_name:
-#            self.endpoint_by_name[name].append(self)
-#        else:
-#            self.endpoint_by_name[name] = [self]
 
     @classmethod
     def _get_container_instance(cls):
@@ -329,22 +319,22 @@ class BaseEndpoint(object):
 
     def _ensure_name_trio(self, name):
         """
-        Helper method to ensure a NameTrio on the passed in name.
+        Helper method returning a NameTrio for the the passed in name, which can be either str, a tuple
+        or already a NameTrio (exchange, name, optional queue_name).
 
-        This BaseEndpoint method assumes RPC - override where appropriate. @TODO for events
-
-        Returns a NameTrio - if the name parameter is already a NameTrio, returns that.
+        If name is a str, assumes system RPC exchange point by default. Override where appropriate
         """
-        # ensure NameTrio
         if not isinstance(name, NameTrio):
             sys_ex = "%s.%s" % (bootstrap.get_sys_name(), CFG.get_safe('exchange.core.system_xs', 'system'))
             name = NameTrio(sys_ex, name)   # if name is a tuple it takes precedence
-            #log.debug("MAKINGNAMETRIO %s\n%s", name, ''.join(traceback.format_list(traceback.extract_stack()[-10:-1])))
+            #log.debug("MAKING NAMETRIO %s\n%s", name, ''.join(traceback.format_list(traceback.extract_stack()[-10:-1])))
 
         return name
 
 
 class SendingBaseEndpoint(BaseEndpoint):
+    """ Provides support for send name """
+
     def __init__(self, node=None, to_name=None, name=None, transport=None):
         BaseEndpoint.__init__(self, node=node, transport=transport)
 
@@ -711,7 +701,8 @@ class Publisher(SendingBaseEndpoint):
     def publish(self, msg, to_name=None, headers=None):
         if to_name is not None:
             if not isinstance(to_name, NameTrio):
-                to_name = NameTrio(bootstrap.get_sys_name(), to_name)   # ensure NT before
+                sys_ex = "%s.%s" % (bootstrap.get_sys_name(), CFG.get_safe('exchange.core.system_xs', 'system'))
+                to_name = NameTrio(sys_ex, to_name)
 
         # only use the cached pub_ep if to_name is None
         ep = None
