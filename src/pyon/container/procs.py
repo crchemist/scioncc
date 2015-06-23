@@ -389,7 +389,7 @@ class ProcManager(object):
         process_instance = self._create_app_instance(process_id, name, module, cls, config, proc_attr)
 
         listen_name = get_safe(config, "process.listen_name") or process_instance.name
-        listen_name_xo = self.container.create_xn_service(listen_name)
+        listen_name_xo = self.container.create_service_xn(listen_name)
 
         log.debug("Service Process (%s) listen_name: %s", name, listen_name)
         process_instance._proc_listen_name = listen_name
@@ -445,7 +445,7 @@ class ProcManager(object):
         publish_streams = get_safe(config, "process.publish_streams")
         pub_names = self._set_publisher_endpoints(process_instance, publish_streams)
 
-        pid_listener_xo = self.container.create_xn_process(process_instance.id)
+        pid_listener_xo = self.container.create_process_xn(process_instance.id)
         rsvc = self._create_listening_endpoint(node=self.container.node,
                                                from_name=pid_listener_xo,
                                                process=process_instance)
@@ -499,7 +499,7 @@ class ProcManager(object):
         if resource_id:
             process_instance.resource_id = resource_id
 
-            resource_id_xo = self.container.create_xn_process(resource_id)
+            resource_id_xo = self.container.create_process_xn(resource_id)
 
             alistener = self._create_listening_endpoint(node=self.container.node,
                                                         from_name=resource_id_xo,
@@ -507,7 +507,7 @@ class ProcManager(object):
 
             listeners.append(alistener)
 
-        pid_listener_xo = self.container.create_xn_process(process_instance.id)
+        pid_listener_xo = self.container.create_process_xn(process_instance.id)
         rsvc = self._create_listening_endpoint(node=self.container.node,
                                                from_name=pid_listener_xo,
                                                process=process_instance)
@@ -555,7 +555,7 @@ class ProcManager(object):
         Attach to service pid.
         """
         process_instance = self._create_app_instance(process_id, name, module, cls, config, proc_attr)
-        pid_listener_xo = self.container.create_xn_process(process_instance.id)
+        pid_listener_xo = self.container.create_process_xn(process_instance.id)
         rsvc = self._create_listening_endpoint(node=self.container.node,
                                                from_name=pid_listener_xo,
                                                process=process_instance)

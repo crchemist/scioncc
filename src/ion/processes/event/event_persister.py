@@ -64,7 +64,8 @@ class EventPersister(StandaloneProcess):
         # Event subscription
         self.event_sub = EventSubscriber(pattern=EventSubscriber.ALL_EVENTS,
                                          callback=self._on_event,
-                                         queue_name="event_persister")
+                                         queue_name="event_persister",
+                                         auto_delete=False)
 
         self.event_sub.start()
 
