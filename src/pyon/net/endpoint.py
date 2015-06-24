@@ -478,6 +478,8 @@ class ListeningBaseEndpoint(BaseEndpoint):
             if self.node is not None and self.node != self._recv_name.node:
                 log.warn("ListeningBaseEndpoint.__init__: setting new node from XO when node already set")
             self.node = self._recv_name.node
+            if auto_delete is not None:
+                self._recv_name.queue_auto_delete = auto_delete
 
         self._ready_event = event.Event()
         self._binding = binding
@@ -495,6 +497,8 @@ class ListeningBaseEndpoint(BaseEndpoint):
         ch = BaseEndpoint._create_channel(self, **kwargs)
         if self._auto_delete is not None:
             ch.queue_auto_delete = self._auto_delete
+        elif hasattr(self._recv_name, "queue_auto_delete"):
+            ch.queue_auto_delete = self._recv_name.queue_auto_delete
         return ch
 
     def get_ready_event(self):

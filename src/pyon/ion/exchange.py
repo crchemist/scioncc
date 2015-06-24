@@ -1016,6 +1016,9 @@ class ExchangeName(XOTransport, NameTrio):
     def purge(self):
         return self.purge_impl(self.queue)
 
+    def __str__(self):
+        return self.xn_type + "-" + NameTrio.__str__(self)
+
 
 class ExchangePoint(ExchangeName):
     """

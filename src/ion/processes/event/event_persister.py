@@ -7,7 +7,7 @@ from gevent.queue import Queue
 from gevent.event import Event
 
 from pyon.ion.event import EventSubscriber
-from pyon.ion.process import StandaloneProcess
+from pyon.ion.process import SimpleProcess
 from pyon.util.async import spawn
 from pyon.util.containers import named_any
 from pyon.public import log
@@ -15,7 +15,7 @@ from pyon.public import log
 PROCESS_PLUGINS = []
 
 
-class EventPersister(StandaloneProcess):
+class EventPersister(SimpleProcess):
 
     def on_init(self):
         # Time in between event persists

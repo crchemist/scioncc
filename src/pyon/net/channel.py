@@ -704,7 +704,7 @@ class RecvChannel(BaseChannel):
         BaseChannel.close_impl(self)
 
     def _declare_queue(self, queue):
-        # prepend xp name in the queue for anti-clobbering
+        # Prepend xp name in the queue for anti-clobbering
         if queue and not queue.startswith(self._recv_name.exchange + "."):
             queue = ".".join([self._recv_name.exchange, queue])
             #log.debug('Auto-prepending exchange to queue name for anti-clobbering: %s', queue)
